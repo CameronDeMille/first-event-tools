@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import { useState, useMemo, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState, useMemo, useEffect } from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Table,
   TableBody,
@@ -10,28 +10,28 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/collapsible'
+import { Button } from '@/components/ui/button'
 import {
   Clock,
   Users,
@@ -40,70 +40,70 @@ import {
   ChevronUp,
   Plus,
   Trash2,
-} from "lucide-react";
-import { ModeToggle } from "@/components/mode-toggle";
+} from 'lucide-react'
+import { ModeToggle } from '@/components/mode-toggle'
 
 type ScheduleItem = {
-  time: string;
-  description: string;
-  duration?: number;
-  isQualificationMatches?: boolean;
-};
+  time: string
+  description: string
+  duration?: number
+  isQualificationMatches?: boolean
+}
 
 // TODO: Move code into hooks and components
 export default function FTCEventScheduleBuilder() {
-  const [teams, setTeams] = useState(10);
-  const [cycleTime, setCycleTime] = useState(5);
-  const [matchesPerTeam, setMatchesPerTeam] = useState(5);
+  const [teams, setTeams] = useState(10)
+  const [cycleTime, setCycleTime] = useState(5)
+  const [matchesPerTeam, setMatchesPerTeam] = useState(5)
   const [qualificationMatchesTableOpen, setQualificationMatchesTableOpen] =
-    useState(false);
+    useState(false)
   const [schedule, setSchedule] = useState<ScheduleItem[]>([
-    { time: "07:00", description: "Volunteer Check-In" },
-    { time: "07:30", description: "Teams Check-In" },
-    { time: "08:00", description: "Judging Begins, Driver & Field Inspection" },
-    { time: "10:30", description: "Driver meeting" },
-    { time: "10:45", description: "Opening Ceremony" },
+    { time: '07:00', description: 'Volunteer Check-In' },
+    { time: '07:30', description: 'Teams Check-In' },
+    { time: '08:00', description: 'Judging Begins, Driver & Field Inspection' },
+    { time: '10:30', description: 'Driver meeting' },
+    { time: '10:45', description: 'Opening Ceremony' },
     {
-      time: "11:00",
-      description: "Qualifying matches",
+      time: '11:00',
+      description: 'Qualifying matches',
       isQualificationMatches: true,
     },
-    { time: "12:30", description: "Lunch break" },
-    { time: "13:55", description: "Alliance Selection Starts" },
-    { time: "14:10", description: "Semifinals" },
-    { time: "14:35", description: "Finals" },
-    { time: "14:55", description: "Finals end" },
-    { time: "15:10", description: "Award Ceremony Begins" },
-    { time: "15:40", description: "Award Ceremony Ends" },
-  ]);
+    { time: '12:30', description: 'Lunch break' },
+    { time: '13:55', description: 'Alliance Selection Starts' },
+    { time: '14:10', description: 'Semifinals' },
+    { time: '14:35', description: 'Finals' },
+    { time: '14:55', description: 'Finals end' },
+    { time: '15:10', description: 'Award Ceremony Begins' },
+    { time: '15:40', description: 'Award Ceremony Ends' },
+  ])
 
   const calculateResult = (t: number, c: number, m: number) => {
-    const totalMatches = Math.ceil((t * m) / 2);
-    return Number(((totalMatches * c) / 60).toFixed(2));
-  };
+    const totalMatches = Math.ceil((t * m) / 2)
+    return Number(((totalMatches * c) / 60).toFixed(2))
+  }
 
   const result = useMemo(
     () => calculateResult(teams, cycleTime, matchesPerTeam),
-    [teams, cycleTime, matchesPerTeam]
-  );
+    [teams, cycleTime, matchesPerTeam],
+  )
 
   useEffect(() => {
     setSchedule((prevSchedule) => {
-      const updatedSchedule = [...prevSchedule];
+      const updatedSchedule = [...prevSchedule]
       const qualMatchIndex = updatedSchedule.findIndex(
-        (item) => item.isQualificationMatches
-      );
+        (item) => item.isQualificationMatches,
+      )
       if (qualMatchIndex !== -1) {
-        updatedSchedule[qualMatchIndex].duration = result;
+        updatedSchedule[qualMatchIndex].duration = result
       }
-      return updatedSchedule;
-    });
-  }, [result]);
+      return updatedSchedule
+    })
+  }, [result])
 
-  const generateTableData = () => {
-    const teamOptions = Array.from({ length: 31 }, (_, i) => i + 10);
-    const cycleTimeOptions = Array.from({ length: 13 }, (_, i) => i * 0.5 + 4);
-    const matchesPerTeamOptions = [5, 6];
+  const tableData = useMemo(() => {
+    const teamOptions = Array.from({ length: 31 }, (_, i) => i + 10)
+    const cycleTimeOptions = Array.from({ length: 13 }, (_, i) => i * 0.5 + 4)
+    const matchesPerTeamOptions = [5, 6]
 
     return teamOptions.map((t) => ({
       teams: t,
@@ -115,47 +115,42 @@ export default function FTCEventScheduleBuilder() {
           isHighlighted: t === teams && c === cycleTime && m === matchesPerTeam,
         })),
       })),
-    }));
-  };
-
-  const tableData = useMemo(
-    () => generateTableData(),
-    [teams, cycleTime, matchesPerTeam]
-  );
+    }))
+  }, [teams, cycleTime, matchesPerTeam])
 
   const teamRanges = [
-    { label: "10-20", teams: tableData.slice(0, 11) },
-    { label: "21-30", teams: tableData.slice(11, 21) },
-    { label: "31-40", teams: tableData.slice(21) },
-  ];
+    { label: '10-20', teams: tableData.slice(0, 11) },
+    { label: '21-30', teams: tableData.slice(11, 21) },
+    { label: '31-40', teams: tableData.slice(21) },
+  ]
 
   const addScheduleItem = () => {
-    setSchedule([...schedule, { time: "", description: "" }]);
-  };
+    setSchedule([...schedule, { time: '', description: '' }])
+  }
 
   const updateScheduleItem = (
     index: number,
-    field: "time" | "description",
-    value: string
+    field: 'time' | 'description',
+    value: string,
   ) => {
-    const newSchedule = [...schedule];
-    newSchedule[index][field] = value;
-    setSchedule(newSchedule);
-  };
+    const newSchedule = [...schedule]
+    newSchedule[index][field] = value
+    setSchedule(newSchedule)
+  }
 
   const removeScheduleItem = (index: number) => {
-    setSchedule(schedule.filter((_, i) => i !== index));
-  };
+    setSchedule(schedule.filter((_, i) => i !== index))
+  }
 
   const calculateEndTime = (startTime: string, durationHours: number) => {
-    const [hours, minutes] = startTime.split(":").map(Number);
-    const totalMinutes = hours * 60 + minutes + durationHours * 60;
-    const endHours = Math.floor(totalMinutes / 60) % 24;
-    const endMinutes = totalMinutes % 60;
-    return `${endHours.toString().padStart(2, "0")}:${endMinutes
+    const [hours, minutes] = startTime.split(':').map(Number)
+    const totalMinutes = hours * 60 + minutes + durationHours * 60
+    const endHours = Math.floor(totalMinutes / 60) % 24
+    const endMinutes = totalMinutes % 60
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes
       .toString()
-      .padStart(2, "0")}`;
-  };
+      .padStart(2, '0')}`
+  }
 
   return (
     <>
@@ -230,10 +225,37 @@ export default function FTCEventScheduleBuilder() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="teams" className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Start Time
+              </Label>
+              <Input type="time" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="teams" className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                End Time
+              </Label>
+              <Input type="time" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="teams" className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Number of Judging Panels
+              </Label>
+              <Input type="number" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="teams" className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Number of teams per panel
+              </Label>
+              <Input type="number" />
+            </div>
           </div>
-
           <div className="text-3xl font-bold mb-8 text-center p-4 bg-primary/10 rounded-lg">
-            Qualification Matches Duration:{" "}
+            Qualification Matches Duration:{' '}
             <span className="text-primary">{result} hours</span>
           </div>
 
@@ -304,15 +326,15 @@ export default function FTCEventScheduleBuilder() {
                                     key={`${teamRow.teams}-${cycleRow.cycleTime}-${matchRow.matchesPerTeam}`}
                                     className={
                                       matchRow.isHighlighted
-                                        ? "bg-primary/20 font-bold"
-                                        : ""
+                                        ? 'bg-primary/20 font-bold'
+                                        : ''
                                     }
                                   >
                                     {matchRow.result}
                                   </TableCell>
                                 ))}
                               </TableRow>
-                            ))
+                            )),
                           )}
                         </TableBody>
                       </Table>
@@ -331,7 +353,7 @@ export default function FTCEventScheduleBuilder() {
                   type="time"
                   value={item.time}
                   onChange={(e) =>
-                    updateScheduleItem(index, "time", e.target.value)
+                    updateScheduleItem(index, 'time', e.target.value)
                   }
                   className="w-32"
                 />
@@ -339,7 +361,7 @@ export default function FTCEventScheduleBuilder() {
                   type="text"
                   value={item.description}
                   onChange={(e) =>
-                    updateScheduleItem(index, "description", e.target.value)
+                    updateScheduleItem(index, 'description', e.target.value)
                   }
                   className="flex-grow"
                   placeholder="Event description"
@@ -376,17 +398,20 @@ export default function FTCEventScheduleBuilder() {
               </TableHeader>
               <TableBody>
                 {schedule.map((item, index) => {
-                  const nextItem = schedule[index + 1];
+                  const nextItem = schedule[index + 1]
                   const duration = item.isQualificationMatches
                     ? item.duration
                     : nextItem
-                    ? ((new Date(`2000/01/01 ${nextItem.time}`) as any) -
-                        (new Date(`2000/01/01 ${item.time}`) as any)) /
-                      3600000
-                    : undefined;
+                      ? // TODO: Remove eslint disables here. The code is likely to change here
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        ((new Date(`2000/01/01 ${nextItem.time}`) as any) -
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          (new Date(`2000/01/01 ${item.time}`) as any)) /
+                        3600000
+                      : undefined
                   const endTime = duration
                     ? calculateEndTime(item.time, duration)
-                    : undefined;
+                    : undefined
                   return (
                     <TableRow key={index}>
                       <TableCell>{item.time}</TableCell>
@@ -394,7 +419,7 @@ export default function FTCEventScheduleBuilder() {
                       <TableCell>{item.description}</TableCell>
                       <TableCell>{duration?.toFixed(2)} hours</TableCell>
                     </TableRow>
-                  );
+                  )
                 })}
               </TableBody>
             </Table>
@@ -402,5 +427,5 @@ export default function FTCEventScheduleBuilder() {
         </CardContent>
       </Card>
     </>
-  );
+  )
 }
