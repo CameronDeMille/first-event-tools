@@ -10,46 +10,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Clock, Users, RepeatIcon } from 'lucide-react'
-import { useState, useMemo, useEffect, Dispatch, SetStateAction } from 'react'
+import { useState } from 'react'
 
-type ScheduleItem = {
-  time: string
-  description: string
-  duration?: number
-  isQualificationMatches?: boolean
-}
+const matchesPerTeamOptions = [5, 6, 7, 8]
 
-export default function GlobalInputs({
-  setSchedule,
-}: {
-  setSchedule: Dispatch<SetStateAction<ScheduleItem[]>>
-}) {
+const cycleTimeOptions = Array.from({ length: 13 }, (_, i) => i * 0.5 + 4)
+
+export default function GlobalInputs() {
   const [teams, setTeams] = useState(10)
   const [cycleTime, setCycleTime] = useState(5)
   const [matchesPerTeam, setMatchesPerTeam] = useState(5)
-
-  const calculateResult = (t: number, c: number, m: number) => {
-    const totalMatches = Math.ceil((t * m) / 2)
-    return Number(((totalMatches * c) / 60).toFixed(2))
-  }
-
-  const result = useMemo(
-    () => calculateResult(teams, cycleTime, matchesPerTeam),
-    [teams, cycleTime, matchesPerTeam],
-  )
-
-  useEffect(() => {
-    setSchedule((prevSchedule) => {
-      const updatedSchedule = [...prevSchedule]
-      const qualMatchIndex = updatedSchedule.findIndex(
-        (item) => item.isQualificationMatches,
-      )
-      if (qualMatchIndex !== -1) {
-        updatedSchedule[qualMatchIndex].duration = result
-      }
-      return updatedSchedule
-    })
-  }, [result, setSchedule])
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -67,7 +37,6 @@ export default function GlobalInputs({
           }
           min="10"
           max="40"
-          className="text-lg"
         />
       </div>
       <div className="space-y-2">
@@ -79,13 +48,13 @@ export default function GlobalInputs({
           value={cycleTime.toString()}
           onValueChange={(value) => setCycleTime(Number(value))}
         >
-          <SelectTrigger className="text-lg">
+          <SelectTrigger>
             <SelectValue placeholder="Select cycle time" />
           </SelectTrigger>
           <SelectContent>
-            {Array.from({ length: 13 }, (_, i) => (
-              <SelectItem key={i} value={(i * 0.5 + 4).toString()}>
-                {(i * 0.5 + 4).toFixed(1)}
+            {cycleTimeOptions.map((option) => (
+              <SelectItem key={option} value={`${option}`}>
+                {option}
               </SelectItem>
             ))}
           </SelectContent>
@@ -100,12 +69,15 @@ export default function GlobalInputs({
           value={matchesPerTeam.toString()}
           onValueChange={(value) => setMatchesPerTeam(Number(value))}
         >
-          <SelectTrigger className="text-lg">
+          <SelectTrigger>
             <SelectValue placeholder="Select matches per team" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="5">5</SelectItem>
-            <SelectItem value="6">6</SelectItem>
+            {matchesPerTeamOptions.map((option) => (
+              <SelectItem key={option} value={`${option}`}>
+                {option}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
