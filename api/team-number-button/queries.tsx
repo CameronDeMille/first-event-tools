@@ -19,3 +19,12 @@ export const prefetchTeamsByEvent = async (
     queryKey: [QueryKeys.TEAMS, eventCode],
     queryFn: () => fetchTeamsByEvent(eventCode),
   })
+
+export const fetchQueryTeamsByEvent = async (
+  queryClient: QueryClient,
+  eventCode: string,
+) =>
+  await queryClient.fetchQuery({
+    queryKey: [QueryKeys.TEAMS, eventCode],
+    queryFn: () => fetchTeamsByEvent(eventCode),
+  })

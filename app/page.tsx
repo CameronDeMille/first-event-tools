@@ -1,4 +1,5 @@
-import { prefetchTeamsByEvent } from '@/api/team-number-button/queries'
+import { fetchQueryTeamsByEvent } from '@/api/team-number-button/queries'
+import { Team } from '@/api/team-number-button/types'
 import TeamNumberButtonsPage from '@/components/team-number-buttons/team-number-buttons-page'
 import {
   HydrationBoundary,
@@ -10,16 +11,18 @@ type Params = {
   eventCode: string
 }
 
-export const Page = async ({ searchParams }: { searchParams: Params }) => {
+export default async function Page({ searchParams }: { searchParams: Params }) {
   const queryClient = new QueryClient()
 
-  await prefetchTeamsByEvent(queryClient, searchParams.eventCode)
+  let teams: Team[] = []
+
+  if (searchParams.eventCode) {
+    teams = await fetchQueryTeamsByEvent(queryClient, searchParams.eventCode)
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <TeamNumberButtonsPage eventCode={searchParams.eventCode} />
+      <TeamNumberButtonsPage eventCode={searchParams.eventCode} teams={teams} />
     </HydrationBoundary>
   )
 }
-
-export default Page
