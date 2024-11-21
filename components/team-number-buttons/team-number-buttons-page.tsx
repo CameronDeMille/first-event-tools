@@ -1,11 +1,22 @@
 'use client'
 
+import { ModeToggle } from '../mode-toggle'
+import { Label } from '../ui/label'
+import { Pill } from '../ui/pill'
+import { Team } from '@/api/team-number-button/types'
 import {
   TeamButton,
   TeamButtonImage,
 } from '@/components/team-number-buttons/team-button'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -14,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const TEAM_BUTTON_IMAGES = [
@@ -61,69 +73,157 @@ const teamButtonScaleOptions = Object.values(TEAM_BUTTON_SCALES)
 
 type TeamButtonSizes = keyof typeof TEAM_BUTTON_SCALES
 
+const exampleTeamButtonImage = TEAM_BUTTON_IMAGES[0]
+const EXAMPLE_TEAM_NUMBER = 12345
+
 export default function TeamNumberButtonsPage({
   eventCode,
+  teams,
 }: {
   eventCode: string
+  teams: Team[]
 }) {
-  console.log('eventCode', eventCode)
-
-  const [teamNumber, setTeamNumber] = useState('12345')
+  const [teamNumbers, setTeamNumbers] = useState(
+    teams.map((team) => team.teamNumber),
+  )
+  const [newTeamNumber, setNewTeamNumber] = useState<number>()
   const [buttonScale, setButtonScale] = useState<TeamButtonSizes>(
     TEAM_BUTTON_SCALES['2.25'].size,
   )
+  const [newEventCode, setNewEventCode] = useState(eventCode)
+
+  const router = useRouter()
 
   return (
-    <div className="flex lg:flex-row flex-col">
+    <div className="mx-auto max-w-4xl">
       <Card className="h-full m-10 print:hidden border-t-4 border-t-orange-500 rounded-sm">
         <CardHeader>
-          <CardTitle className="text-xl font-bold">
-            FIRST Tech Challenge Team Buttons
+          <CardTitle className="text-xl font-bold justify-between flex items-end">
+            FIRST Tech Challenge Team Buttons <ModeToggle />
           </CardTitle>
+          <CardDescription>
+            Designed for Chrome. Set margins in print dialog to either
+            &quot;Default&quot; or &quot;None&quot; to get correct print sizing.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          Enter team number:
-          <Input
-            type="number"
-            value={teamNumber}
-            onChange={(e) => {
-              setTeamNumber(e.target.value)
-            }}
-          />
-          Button size (cut size):
-          <Select
-            onValueChange={(value: TeamButtonSizes) => setButtonScale(value)}
-            value={buttonScale}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {teamButtonScaleOptions.map((option) => (
-                <SelectItem key={option.size} value={option.size}>
-                  {option.size} ({option.cutSize})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p>Designed for Chrome -- your mileage may vary in other browsers.</p>
-          <p>
-            Set margins in print dialog to either &quot;Default&quot; or
-            &quot;None&quot; to get correct print sizing.
-          </p>
-          <Button onClick={() => window.print()}>🖨️ Print</Button>
+          <div className="flex lg:items-center flex-col lg:flex-row items-start">
+            <div className="flex gap-3 flex-col">
+              <div className="flex items-end gap-4">
+                <div>
+                  <Label htmlFor="text">Enter Team Number:</Label>
+                  <Input
+                    id="newTeamNumber"
+                    type="number"
+                    value={newTeamNumber}
+                    onChange={(e) => {
+                      setNewTeamNumber(Number(e.target.value))
+                    }}
+                  />
+                </div>
+                <Button
+                  onClick={() => {
+                    if (newTeamNumber) {
+                      setTeamNumbers((teamNumbers) => [
+                        ...teamNumbers,
+                        newTeamNumber,
+                      ])
+                    }
+                  }}
+                >
+                  Add Team
+                </Button>
+              </div>
+              <div className="flex items-end gap-4">
+                <div>
+                  <Label htmlFor="newEventCode">Enter Event Code:</Label>
+                  <Input
+                    id="newEventCode"
+                    type="text"
+                    defaultValue={newEventCode}
+                    onChange={(e) => {
+                      setNewEventCode(e.target.value)
+                    }}
+                  />
+                </div>
+                <Button
+                  onClick={() => router.replace(`/?eventCode=${newEventCode}`)}
+                >
+                  Import Teams
+                </Button>
+              </div>
+              <div className="flex gap-1 flex-wrap">
+                {teamNumbers.map((teamNumber) => (
+                  <Pill
+                    onRemove={() => {
+                      setTeamNumbers((teamNumbers) =>
+                        teamNumbers.filter(
+                          (_teamNumber) => _teamNumber != teamNumber,
+                        ),
+                      )
+                    }}
+                    key={teamNumber}
+                    label={`${teamNumber}${teamNumber < 10000 ? ' ' : ''}`}
+                    // className="w-20"
+                  />
+                ))}
+              </div>
+              <div className="mb-5">
+                <Label htmlFor="buttonScale"> Button size (cut size):</Label>
+                <Select
+                  name="buttonScale"
+                  onValueChange={(value: TeamButtonSizes) =>
+                    setButtonScale(value)
+                  }
+                  value={buttonScale}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teamButtonScaleOptions.map((option) => (
+                      <SelectItem key={option.size} value={option.size}>
+                        {option.size} ({option.cutSize})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="mx-auto">
+              <div className="w-[288px]">
+                <TeamButton
+                  className={`${TEAM_BUTTON_SCALES[buttonScale].className} ${exampleTeamButtonImage.className}`}
+                >
+                  <TeamButtonImage
+                    src={exampleTeamButtonImage.url}
+                    alt={exampleTeamButtonImage.alt}
+                  >
+                    {EXAMPLE_TEAM_NUMBER}
+                  </TeamButtonImage>
+                </TeamButton>
+              </div>
+            </div>
+          </div>
         </CardContent>
+        <CardFooter>
+          <Button onClick={() => window.print()}>🖨️ Print</Button>
+        </CardFooter>
       </Card>
-      <div className="grid grid-cols-2">
-        {TEAM_BUTTON_IMAGES.map((image, index) => (
-          <div className="w-[288px]" key={index}>
-            <TeamButton
-              className={`${TEAM_BUTTON_SCALES[buttonScale].className} ${image.className}`}
-            >
-              <TeamButtonImage src={image.url} alt={image.alt}>
-                {teamNumber}
-              </TeamButtonImage>
-            </TeamButton>
+      <div className="hidden print:block">
+        {teamNumbers.map((teamNumber) => (
+          <div className="grid grid-cols-2" key={teamNumber}>
+            {TEAM_BUTTON_IMAGES.map((image, index) => (
+              <div className="w-[288px]" key={index}>
+                <TeamButton
+                  className={`${TEAM_BUTTON_SCALES[buttonScale].className} ${image.className}`}
+                >
+                  <TeamButtonImage src={image.url} alt={image.alt}>
+                    {teamNumber}
+                  </TeamButtonImage>
+                </TeamButton>
+              </div>
+            ))}
           </div>
         ))}
       </div>
