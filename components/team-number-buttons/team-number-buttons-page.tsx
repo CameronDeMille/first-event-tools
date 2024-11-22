@@ -1,6 +1,15 @@
 'use client'
 
 import { ModeToggle } from '../mode-toggle'
+import {
+  Form as FormProvider,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form'
 import { Label } from '../ui/label'
 import { Pill } from '../ui/pill'
 import { Team } from '@/api/team-number-button/types'
@@ -25,8 +34,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useRouter } from 'next/navigation'
+import { zodResolver } from '@hookform/resolvers/zod'
+import Form from 'next/form'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const TEAM_BUTTON_IMAGES = [
   {
@@ -76,6 +88,14 @@ type TeamButtonSizes = keyof typeof TEAM_BUTTON_SCALES
 const exampleTeamButtonImage = TEAM_BUTTON_IMAGES[0]
 const EXAMPLE_TEAM_NUMBER = 12345
 
+const eventCodeFormSchema = z.object({
+  eventCode: z.string(),
+})
+
+const newTeamNumberFormSchema = z.object({
+  newTeamNumber: z.string().min(1, { message: 'Required' }),
+})
+
 export default function TeamNumberButtonsPage({
   eventCode,
   teams,
@@ -86,20 +106,43 @@ export default function TeamNumberButtonsPage({
   const [teamNumbers, setTeamNumbers] = useState(
     teams.map((team) => team.teamNumber),
   )
-  const [newTeamNumber, setNewTeamNumber] = useState<number>()
   const [buttonScale, setButtonScale] = useState<TeamButtonSizes>(
     TEAM_BUTTON_SCALES['2.25'].size,
   )
-  const [newEventCode, setNewEventCode] = useState(eventCode)
 
-  const router = useRouter()
+  const eventCodeForm = useForm<z.infer<typeof eventCodeFormSchema>>({
+    resolver: zodResolver(eventCodeFormSchema),
+    defaultValues: {
+      eventCode: eventCode ?? '',
+    },
+  })
+
+  const newTeamNumberForm = useForm<z.infer<typeof newTeamNumberFormSchema>>({
+    resolver: zodResolver(newTeamNumberFormSchema),
+    defaultValues: {
+      newTeamNumber: '',
+    },
+  })
+
+  const onNewTeamNumberSubmit = (
+    values: z.infer<typeof newTeamNumberFormSchema>,
+  ) => {
+    setTeamNumbers((teamNumbers) => [
+      ...teamNumbers,
+      Number(values.newTeamNumber),
+    ])
+    newTeamNumberForm.reset()
+  }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-5xl">
       <Card className="h-full m-10 print:hidden border-t-4 border-t-orange-500 rounded-sm">
         <CardHeader>
-          <CardTitle className="text-xl font-bold justify-between flex items-end">
-            FIRST Tech Challenge Team Buttons <ModeToggle />
+          <CardTitle className="text-xl font-bold justify-between flex items-end gap-2">
+            FIRST Tech Challenge Team Buttons
+            <div className="shrink-0 flex self-start">
+              <ModeToggle />
+            </div>
           </CardTitle>
           <CardDescription>
             Designed for Chrome. Set margins in print dialog to either
@@ -107,68 +150,98 @@ export default function TeamNumberButtonsPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex lg:items-center flex-col lg:flex-row items-start">
-            <div className="flex gap-3 flex-col">
+          <div className="flex items-center flex-col lg:flex-row lg:items-start">
+            <div className="flex gap-3 flex-col flex-1">
               <div className="flex items-end gap-4">
-                <div>
-                  <Label htmlFor="text">Enter Team Number:</Label>
-                  <Input
-                    id="newTeamNumber"
-                    type="number"
-                    value={newTeamNumber}
-                    onChange={(e) => {
-                      setNewTeamNumber(Number(e.target.value))
-                    }}
-                  />
-                </div>
-                <Button
-                  onClick={() => {
-                    if (newTeamNumber) {
-                      setTeamNumbers((teamNumbers) => [
-                        ...teamNumbers,
-                        newTeamNumber,
-                      ])
-                    }
-                  }}
-                >
-                  Add Team
-                </Button>
+                <FormProvider {...newTeamNumberForm}>
+                  <form
+                    onSubmit={newTeamNumberForm.handleSubmit(
+                      onNewTeamNumberSubmit,
+                    )}
+                    className="flex flex-row items-center w-full"
+                  >
+                    <FormField
+                      control={newTeamNumberForm.control}
+                      name="newTeamNumber"
+                      render={({ field }) => (
+                        <FormItem className="w-full sm:w-auto">
+                          <FormLabel>Enter Team Number</FormLabel>
+                          <FormControl>
+                            <div className="flex sm:flex-row flex-col gap-4">
+                              <Input
+                                {...field}
+                                type="text"
+                                placeholder="12345"
+                              />
+                              <Button type="submit">Add Team</Button>
+                              <Button
+                                type="button"
+                                onClick={() => {
+                                  setTeamNumbers((teamNumbers) => [
+                                    ...teamNumbers,
+                                    Math.min(...teamNumbers) > 0
+                                      ? -1
+                                      : Math.min(...teamNumbers) - 1,
+                                  ])
+                                }}
+                              >
+                                Add Blank
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Team numbers are added one at a time
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </FormProvider>
               </div>
               <div className="flex items-end gap-4">
-                <div>
-                  <Label htmlFor="newEventCode">Enter Event Code:</Label>
-                  <Input
-                    id="newEventCode"
-                    type="text"
-                    defaultValue={newEventCode}
-                    onChange={(e) => {
-                      setNewEventCode(e.target.value)
-                    }}
-                  />
-                </div>
-                <Button
-                  onClick={() => router.replace(`/?eventCode=${newEventCode}`)}
-                >
-                  Import Teams
-                </Button>
+                <FormProvider {...eventCodeForm}>
+                  <Form
+                    action="/"
+                    className="flex flex-row items-center w-full"
+                    replace
+                    prefetch={false}
+                  >
+                    <FormField
+                      control={eventCodeForm.control}
+                      name="eventCode"
+                      render={({ field }) => (
+                        <FormItem className="w-full sm:w-auto">
+                          <FormLabel>Enter Event Code</FormLabel>
+                          <FormControl>
+                            <div className="flex sm:flex-row flex-col gap-4">
+                              <Input
+                                {...field}
+                                type="text"
+                                placeholder="FTCCMP1"
+                              />
+                              <Button type="submit">Import Teams</Button>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Event codes can be found on{' '}
+                            <a
+                              className="text-blue-500 underline hover:text-blue-800"
+                              target="_blank"
+                              rel="noreferrer"
+                              href="https://ftc-events.firstinspires.org/"
+                            >
+                              FTC Events
+                            </a>
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </Form>
+                </FormProvider>
               </div>
-              <div className="flex gap-1 flex-wrap">
-                {teamNumbers.map((teamNumber) => (
-                  <Pill
-                    onRemove={() => {
-                      setTeamNumbers((teamNumbers) =>
-                        teamNumbers.filter(
-                          (_teamNumber) => _teamNumber != teamNumber,
-                        ),
-                      )
-                    }}
-                    key={teamNumber}
-                    label={`${teamNumber}${teamNumber < 10000 ? ' ' : ''}`}
-                    // className="w-20"
-                  />
-                ))}
-              </div>
-              <div className="mb-5">
+              <div className="mb-5 sm:max-w-[185px]">
                 <Label htmlFor="buttonScale"> Button size (cut size):</Label>
                 <Select
                   name="buttonScale"
@@ -189,6 +262,24 @@ export default function TeamNumberButtonsPage({
                   </SelectContent>
                 </Select>
               </div>
+              <div className="min-h-24">
+                <ul className="flex gap-1 flex-wrap">
+                  {teamNumbers.map((teamNumber, index) => (
+                    <Pill
+                      onRemove={() => {
+                        setTeamNumbers((teamNumbers) =>
+                          teamNumbers.filter(
+                            (_teamNumber) => _teamNumber != teamNumber,
+                          ),
+                        )
+                      }}
+                      key={index}
+                    >
+                      {teamNumber < 0 ? 'Blank' : teamNumber}
+                    </Pill>
+                  ))}
+                </ul>
+              </div>
             </div>
             <div className="mx-auto">
               <div className="w-[288px]">
@@ -207,7 +298,9 @@ export default function TeamNumberButtonsPage({
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={() => window.print()}>🖨️ Print</Button>
+          <Button className="sm:w-auto w-full" onClick={() => window.print()}>
+            🖨️ Print
+          </Button>
         </CardFooter>
       </Card>
       <div className="hidden print:block">
@@ -219,7 +312,7 @@ export default function TeamNumberButtonsPage({
                   className={`${TEAM_BUTTON_SCALES[buttonScale].className} ${image.className}`}
                 >
                   <TeamButtonImage src={image.url} alt={image.alt}>
-                    {teamNumber}
+                    {teamNumber < 0 ? '' : teamNumber}
                   </TeamButtonImage>
                 </TeamButton>
               </div>
