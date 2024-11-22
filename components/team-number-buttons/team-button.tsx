@@ -27,7 +27,7 @@ const TeamButtonImage = React.forwardRef<
     <svg className="absolute top-0 left-0">
       <path id="path0" d="M 77 77 A 96 96 0 0 1 211 77" fill="none" />
       <text
-        className="text-[0.4in] font-bold tracking-[-2px] font-arial"
+        className="text-[0.4in] font-bold tracking-[-2px]"
         style={{ textAnchor: 'middle' }}
       >
         <textPath id="text0" href="#path0" startOffset="50%">
