@@ -1,3 +1,5 @@
+'use server'
+
 import { fetchQueryTeamsByEvent } from '@/api/team-number-button/queries'
 import { Team } from '@/api/team-number-button/types'
 import TeamNumberButtonsPage from '@/components/team-number-buttons/team-number-buttons-page'
@@ -7,22 +9,24 @@ import {
   dehydrate,
 } from '@tanstack/react-query'
 
-type Params = {
+type Params = Promise<{
   eventCode: string
-}
+}>
 
 export default async function Page({ searchParams }: { searchParams: Params }) {
   const queryClient = new QueryClient()
 
+  const { eventCode } = await searchParams
+
   let teams: Team[] = []
 
-  if (searchParams.eventCode) {
-    teams = await fetchQueryTeamsByEvent(queryClient, searchParams.eventCode)
+  if (eventCode) {
+    teams = await fetchQueryTeamsByEvent(queryClient, eventCode)
   }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <TeamNumberButtonsPage eventCode={searchParams.eventCode} teams={teams} />
+      <TeamNumberButtonsPage eventCode={eventCode} teams={teams} />
     </HydrationBoundary>
   )
 }
