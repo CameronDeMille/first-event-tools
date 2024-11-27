@@ -154,7 +154,7 @@ export default function TeamNumberButtonsPage({
         </CardHeader>
         <CardContent>
           <div className="flex items-center flex-col lg:flex-row lg:items-start">
-            <div className="flex gap-3 flex-col flex-1">
+            <div className="flex gap-3 flex-col flex-1 w-full">
               <div className="flex items-end gap-4">
                 <FormProvider {...newTeamNumberForm}>
                   <form
