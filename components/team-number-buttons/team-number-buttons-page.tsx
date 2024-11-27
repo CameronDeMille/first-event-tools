@@ -35,7 +35,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
-import Form from 'next/form'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -134,6 +133,10 @@ export default function TeamNumberButtonsPage({
     newTeamNumberForm.reset()
   }
 
+  const onEventCodeSubmit = (values: z.infer<typeof eventCodeFormSchema>) => {
+    window.location.href = `/event-print-off?eventCode=${values.eventCode}`
+  }
+
   return (
     <div className="mx-auto max-w-5xl">
       <Card className="h-full m-10 print:hidden border-t-4 border-t-orange-500 rounded-sm">
@@ -173,7 +176,15 @@ export default function TeamNumberButtonsPage({
                                 type="text"
                                 placeholder="12345"
                               />
-                              <Button type="submit">Add Team</Button>
+                              <Button
+                                type="submit"
+                                disabled={
+                                  newTeamNumberForm.formState.isSubmitting ||
+                                  !newTeamNumberForm.formState.isDirty
+                                }
+                              >
+                                Add Team
+                              </Button>
                               <Button
                                 type="button"
                                 onClick={() => {
@@ -201,11 +212,9 @@ export default function TeamNumberButtonsPage({
               </div>
               <div className="flex items-end gap-4">
                 <FormProvider {...eventCodeForm}>
-                  <Form
-                    action="/"
+                  <form
+                    onSubmit={eventCodeForm.handleSubmit(onEventCodeSubmit)}
                     className="flex flex-row items-center w-full"
-                    replace
-                    prefetch={false}
                   >
                     <FormField
                       control={eventCodeForm.control}
@@ -220,7 +229,15 @@ export default function TeamNumberButtonsPage({
                                 type="text"
                                 placeholder="FTCCMP1"
                               />
-                              <Button type="submit">Import Teams</Button>
+                              <Button
+                                type="submit"
+                                disabled={
+                                  eventCodeForm.formState.isSubmitting ||
+                                  !eventCodeForm.formState.isDirty
+                                }
+                              >
+                                Import Teams
+                              </Button>
                             </div>
                           </FormControl>
                           <FormDescription>
@@ -238,7 +255,7 @@ export default function TeamNumberButtonsPage({
                         </FormItem>
                       )}
                     />
-                  </Form>
+                  </form>
                 </FormProvider>
               </div>
               <div className="mb-5 sm:max-w-[185px]">

@@ -1,5 +1,5 @@
-import './globals.css'
 import Providers from './providers'
+import '@/app/globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
@@ -11,7 +11,7 @@ const roboto = Roboto({
 })
 
 export const metadata: Metadata = {
-  title: 'FTC Team Button Printoff',
+  title: 'FTC Team Button Print Off',
   description:
     'A Tool to print off FIRST Tech Challenge team buttons for your event',
   icons: {
