@@ -142,7 +142,7 @@ export default function TeamNumberButtonsPage({
       <Card className="h-full m-10 print:hidden border-t-4 border-t-orange-500 rounded-sm">
         <CardHeader>
           <CardTitle className="text-xl font-bold justify-between flex items-end gap-2">
-            FIRST Tech Challenge Team Buttons
+            [BETA] FIRST Tech Challenge Team Buttons
             <div className="shrink-0 flex self-start">
               <ModeToggle />
             </div>
@@ -150,6 +150,9 @@ export default function TeamNumberButtonsPage({
           <CardDescription>
             Designed for Chrome. Set margins in print dialog to either
             &quot;Default&quot; or &quot;None&quot; to get correct print sizing.
+          </CardDescription>
+          <CardDescription>
+            This site is in beta so expect some bugs and frequent changes.
           </CardDescription>
         </CardHeader>
         <CardContent>
