@@ -159,7 +159,9 @@ export default function TeamNumberButtonsPage({
   }
 
   const onEventCodeSubmit = (values: z.infer<typeof eventCodeFormSchema>) => {
-    window.location.href = `${window.location.origin}?eventCode=${values.eventCode}`
+    const currentUrl = new URL(window.location.href)
+    currentUrl.searchParams.set('eventCode', values.eventCode)
+    window.location.href = currentUrl.toString()
   }
 
   return (
@@ -348,7 +350,7 @@ export default function TeamNumberButtonsPage({
           </Button>
         </CardFooter>
       </Card>
-      <div className="print:block">
+      <div className="hidden print:block">
         <div className={`grid ${TEAM_BUTTON_SCALES[buttonScale].column}`}>
           {teamNumbers.map((teamNumber) =>
             TEAM_BUTTON_IMAGES.map((image, index) => (
