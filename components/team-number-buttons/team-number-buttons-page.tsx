@@ -142,7 +142,7 @@ export default function TeamNumberButtonsPage({
       <Card className="h-full m-10 print:hidden border-t-4 border-t-orange-500 rounded-sm">
         <CardHeader>
           <CardTitle className="text-xl font-bold justify-between flex items-end gap-2">
-            [BETA] FIRST Tech Challenge Team Buttons
+            FIRST Tech Challenge Team Buttons [BETA]
             <div className="shrink-0 flex self-start">
               <ModeToggle />
             </div>
@@ -158,6 +158,54 @@ export default function TeamNumberButtonsPage({
         <CardContent>
           <div className="flex items-center flex-col lg:flex-row lg:items-start">
             <div className="flex gap-3 flex-col flex-1 w-full">
+              <div className="flex items-end gap-4">
+                <FormProvider {...eventCodeForm}>
+                  <form
+                    onSubmit={eventCodeForm.handleSubmit(onEventCodeSubmit)}
+                    className="flex flex-row items-center w-full"
+                  >
+                    <FormField
+                      control={eventCodeForm.control}
+                      name="eventCode"
+                      render={({ field }) => (
+                        <FormItem className="w-full sm:w-auto">
+                          <FormLabel>Enter Event Code</FormLabel>
+                          <FormControl>
+                            <div className="flex sm:flex-row flex-col gap-4">
+                              <Input
+                                {...field}
+                                type="text"
+                                placeholder="FTCCMP1"
+                              />
+                              <Button
+                                type="submit"
+                                disabled={
+                                  eventCodeForm.formState.isSubmitting ||
+                                  !eventCodeForm.formState.isDirty
+                                }
+                              >
+                                Import Teams
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            Event codes can be found on{' '}
+                            <a
+                              className="text-blue-500 underline hover:text-blue-800"
+                              target="_blank"
+                              rel="noreferrer"
+                              href="https://ftc-events.firstinspires.org/"
+                            >
+                              FTC Events
+                            </a>
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </FormProvider>
+              </div>
               <div className="flex items-end gap-4">
                 <FormProvider {...newTeamNumberForm}>
                   <form
@@ -205,54 +253,6 @@ export default function TeamNumberButtonsPage({
                           </FormControl>
                           <FormDescription>
                             Team numbers are added one at a time
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </form>
-                </FormProvider>
-              </div>
-              <div className="flex items-end gap-4">
-                <FormProvider {...eventCodeForm}>
-                  <form
-                    onSubmit={eventCodeForm.handleSubmit(onEventCodeSubmit)}
-                    className="flex flex-row items-center w-full"
-                  >
-                    <FormField
-                      control={eventCodeForm.control}
-                      name="eventCode"
-                      render={({ field }) => (
-                        <FormItem className="w-full sm:w-auto">
-                          <FormLabel>Enter Event Code</FormLabel>
-                          <FormControl>
-                            <div className="flex sm:flex-row flex-col gap-4">
-                              <Input
-                                {...field}
-                                type="text"
-                                placeholder="FTCCMP1"
-                              />
-                              <Button
-                                type="submit"
-                                disabled={
-                                  eventCodeForm.formState.isSubmitting ||
-                                  !eventCodeForm.formState.isDirty
-                                }
-                              >
-                                Import Teams
-                              </Button>
-                            </div>
-                          </FormControl>
-                          <FormDescription>
-                            Event codes can be found on{' '}
-                            <a
-                              className="text-blue-500 underline hover:text-blue-800"
-                              target="_blank"
-                              rel="noreferrer"
-                              href="https://ftc-events.firstinspires.org/"
-                            >
-                              FTC Events
-                            </a>
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
