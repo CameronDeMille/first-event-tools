@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-export default nextConfig
+module.exports = {
+  basePath: '/ftc-event-tools',
+  assetPrefix: '/ftc-event-tools',
+}
