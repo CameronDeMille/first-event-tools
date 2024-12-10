@@ -134,7 +134,7 @@ export default function TeamNumberButtonsPage({
   }
 
   const onEventCodeSubmit = (values: z.infer<typeof eventCodeFormSchema>) => {
-    window.location.href = `?eventCode=${values.eventCode}`
+    window.location.href = `${window.location.origin}?eventCode=${values.eventCode}`
   }
 
   return (
