@@ -73,11 +73,36 @@ const TEAM_BUTTON_IMAGES = [
 ] as const
 
 const TEAM_BUTTON_SCALES = {
-  '1.50': { className: 'scale-[0.587]', size: '1.50', cutSize: '1.76' },
-  '1.75': { className: 'scale-[0.66]', size: '1.75', cutSize: '1.97' },
-  '2.25': { className: 'scale-[0.8333]', size: '2.25', cutSize: '2.50' },
-  '2.50': { className: 'scale-[0.9333]', size: '2.50', cutSize: '2.80' },
-  '3.00': { className: 'scale-[1.115]', size: '3.00', cutSize: '3.35' },
+  '1.50': {
+    className: 'scale-[0.587]',
+    size: '1.50',
+    cutSize: '1.76',
+    column: 'grid-cols-[repeat(4,_1.9in)] auto-rows-[1.9in]',
+  },
+  '1.75': {
+    className: 'scale-[0.66]',
+    size: '1.75',
+    cutSize: '1.97',
+    column: 'grid-cols-[repeat(4,_2.2in)] auto-rows-[2.2in]',
+  },
+  '2.25': {
+    className: 'scale-[0.8333]',
+    size: '2.25',
+    cutSize: '2.50',
+    column: 'grid-cols-[repeat(4,_2.7in)] auto-rows-[2.7in]',
+  },
+  '2.50': {
+    className: 'scale-[0.9333]',
+    size: '2.50',
+    cutSize: '2.80',
+    column: 'grid-cols-[repeat(3,_3in)] auto-rows-[3in]',
+  },
+  '3.00': {
+    className: 'scale-[1.115]',
+    size: '3.00',
+    cutSize: '3.35',
+    column: 'grid-cols-[repeat(2,_6in)] auto-rows-[6in] p-8',
+  },
 } as const
 
 const teamButtonScaleOptions = Object.values(TEAM_BUTTON_SCALES)
@@ -323,22 +348,21 @@ export default function TeamNumberButtonsPage({
           </Button>
         </CardFooter>
       </Card>
-      <div className="hidden print:block">
-        {teamNumbers.map((teamNumber) => (
-          <div className="grid grid-cols-2" key={teamNumber}>
-            {TEAM_BUTTON_IMAGES.map((image, index) => (
-              <div className="w-[288px]" key={index}>
-                <TeamButton
-                  className={`${TEAM_BUTTON_SCALES[buttonScale].className} ${image.className}`}
-                >
-                  <TeamButtonImage src={image.url} alt={image.alt}>
-                    {teamNumber < 0 ? '' : teamNumber}
-                  </TeamButtonImage>
-                </TeamButton>
-              </div>
-            ))}
-          </div>
-        ))}
+      <div className="print:block">
+        <div className={`grid ${TEAM_BUTTON_SCALES[buttonScale].column}`}>
+          {teamNumbers.map((teamNumber) =>
+            TEAM_BUTTON_IMAGES.map((image, index) => (
+              <TeamButton
+                className={`w-[3in] h-[3in] ${TEAM_BUTTON_SCALES[buttonScale].className} ${image.className} mt-5`}
+                key={index}
+              >
+                <TeamButtonImage src={image.url} alt={image.alt}>
+                  {teamNumber < 0 ? '' : teamNumber}
+                </TeamButtonImage>
+              </TeamButton>
+            )),
+          )}
+        </div>
       </div>
     </div>
   )
