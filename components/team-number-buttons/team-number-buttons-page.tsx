@@ -181,6 +181,7 @@ export default function TeamNumberButtonsPage({
           <CardDescription>
             This site is in beta so expect some bugs and frequent changes.
           </CardDescription>
+          <CardDescription></CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center flex-col lg:flex-row lg:items-start">
@@ -248,7 +249,7 @@ export default function TeamNumberButtonsPage({
                         <FormItem className="w-full sm:w-auto">
                           <FormLabel>Enter Team Number</FormLabel>
                           <FormControl>
-                            <div className="flex sm:flex-row flex-col gap-4">
+                            <div className="flex sm:flex-row flex-col gap-5">
                               <Input
                                 {...field}
                                 type="text"
@@ -310,7 +311,7 @@ export default function TeamNumberButtonsPage({
                 </Select>
               </div>
               <div className="min-h-24">
-                <ul className="flex gap-1 flex-wrap">
+                <ul className="flex gap-2 flex-wrap">
                   {teamNumbers.map((teamNumber, index) => (
                     <Pill
                       onRemove={() => {
@@ -344,10 +345,13 @@ export default function TeamNumberButtonsPage({
             </div>
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-4 sm:flex-row justify-between items-center">
           <Button className="sm:w-auto w-full" onClick={() => window.print()}>
             🖨️ Print
           </Button>
+          <CardDescription>
+            Contact us at support@pmrobotics.org
+          </CardDescription>
         </CardFooter>
       </Card>
       <div className="hidden print:block">
