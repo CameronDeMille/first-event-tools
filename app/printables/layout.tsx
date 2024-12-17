@@ -37,6 +37,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </Providers>
+        <script async data-id="101472347" src="//static.getclicky.com/js"></script>
       </body>
     </html>
   )
